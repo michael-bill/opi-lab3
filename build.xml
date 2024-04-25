@@ -1,0 +1,76 @@
+<project name="laba3_web"
+         basedir="."
+         default="build"
+         xmlns:ivy="antlib:org.apache.ivy.ant">
+    <property file="build.properties"/>
+
+    <path id="classpath-runtime">
+        <fileset dir="${lib}" includes="*.jar"/>
+    </path>
+
+    <path id="test.classpath">
+        <pathelement path="dist"/>
+        <pathelement path="${build.classes}"/>
+        <pathelement path="${build.tests}"/>
+        <fileset dir="${ant.home}/lib" includes="*.jar" />
+    </path>
+
+    <target name="init">
+        <tstamp/>
+        <mkdir dir="${build}"/>
+        <mkdir dir="${build.classes}"/>
+        <mkdir dir="${build.tests}"/>
+        <mkdir dir="${dist}"/>
+        <mkdir dir="${dist.lib}"/>
+    </target>
+
+    <target name="download-ivy" unless="skip.download">
+        <mkdir dir="${ivy.jar.dir}"/>
+        <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true"/>
+    </target>
+
+    <target name="install-ivy" depends="download-ivy" description="--> install ivy">
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    </target>
+
+    <target name="resolve dependencies" depends="install-ivy" description="resolve dependencies">
+        <ivy:retrieve log="quiet"/>
+    </target>
+
+    <target name="compile" depends="init, resolve dependencies" description="build classes">
+        <javac includeantruntime="false"
+               srcdir="${src}"
+               destdir="${build.classes}">
+            <classpath refid="classpath-runtime"/>
+        </javac>
+    </target>
+
+    <target name="build" depends="compile" description="Build .war">
+        <ivy:retrieve pattern="${dist.lib}/[artifact]-[revision].[ext]" conf="runtime"/>
+        <war destfile="${dist.war.name}" webxml="${src.webapp.webxml}">
+            <fileset dir="${src.webapp}">
+                <include name="**/*.*"/>
+            </fileset>
+            <lib dir="${dist.lib}"/>
+            <classes dir="${build.classes}"/>
+            <manifest>
+                <section name="Common">
+                    <attribute name="Project-Name" value="${project.name}"/>
+                    <attribute name="Project-Version" value="${project.version}"/>
+                </section>
+            </manifest>
+        </war>
+    </target>
+
+    <target name="clean" description="clean up">
+        <delete dir="${build}"/>
+        <delete dir="${dist.lib}"/>
+        <delete dir="${dist}"/>
+        <delete dir="${lib}"/>
+        <delete dir="${ivy.jar.dir}"/>
+        <delete dir="target"/>
+    </target>
+</project>
