@@ -1,7 +1,6 @@
 <project name="laba3_web"
-         basedir="."
-         default="build"
-         xmlns:ivy="antlib:org.apache.ivy.ant">
+        basedir="."
+        default="build">
     <property file="build.properties"/>
 
     <path id="classpath-runtime">
@@ -24,32 +23,27 @@
         <mkdir dir="${dist.lib}"/>
     </target>
 
-    <target name="download-ivy" unless="skip.download">
-        <mkdir dir="${ivy.jar.dir}"/>
-        <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true"/>
-    </target>
-
-    <target name="install-ivy" depends="download-ivy" description="--> install ivy">
-        <path id="ivy.lib.path">
-            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
-        </path>
-        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
-    </target>
-
-    <target name="resolve dependencies" depends="install-ivy" description="resolve dependencies">
-        <ivy:retrieve log="quiet"/>
+    <target name="resolve dependencies" description="resolve dependencies">
+        <mkdir dir="${dist.lib}"/>
+        <copy todir="${dist.lib}">
+            <fileset dir="${lib}"/>
+        </copy>
     </target>
 
     <target name="compile" depends="init, resolve dependencies" description="build classes">
         <javac includeantruntime="false"
                srcdir="${src}"
-               destdir="${build.classes}">
+               destdir="${build.classes}"
+               source="11"
+               target="11">
             <classpath refid="classpath-runtime"/>
         </javac>
+        <copy todir="${build.classes}">
+            <fileset dir="${src.main.resources}"/>
+        </copy>
     </target>
 
     <target name="build" depends="compile" description="Build .war">
-        <ivy:retrieve pattern="${dist.lib}/[artifact]-[revision].[ext]" conf="runtime"/>
         <war destfile="${dist.war.name}" webxml="${src.webapp.webxml}">
             <fileset dir="${src.webapp}">
                 <include name="**/*.*"/>
@@ -69,7 +63,6 @@
         <delete dir="${build}"/>
         <delete dir="${dist.lib}"/>
         <delete dir="${dist}"/>
-        <delete dir="${lib}"/>
         <delete dir="${ivy.jar.dir}"/>
         <delete dir="target"/>
     </target>
