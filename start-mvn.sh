@@ -1,4 +1,4 @@
-mvn clean package
+mvn clean package -DskipTests
 docker rm -f jsf-web-lab3-application
 docker rmi -f opi-lab3-jsf-web-lab3-application
 docker-compose up -d

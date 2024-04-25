@@ -44,7 +44,7 @@ public class PointBean implements Serializable {
                 ZonedDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")), httpSessionId));
     }
 
-    private boolean validation(double x, double y, double r) {
+    public static boolean validation(double x, double y, double r) {
         boolean square = (0 <= x) && (x <= r) && (0 <= y) && (y <= r);
         boolean triangle = (x >= 0) && (y <= 0) && (y >= x - r / 2);
         boolean circle = (x <= 0) && (y >= 0) && (x * x + y * y <= r * r / 4);

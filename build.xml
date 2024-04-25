@@ -59,6 +59,34 @@
         </war>
     </target>
 
+    <target name="compile-tests" depends="compile" description="--> compile tests">
+    <javac includeantruntime="false"
+               srcdir="${src.test}"
+               destdir="${build.tests}">
+            <classpath >
+                <path refid="classpath-runtime"/>
+                <path path="${src.test}"/>
+                <pathelement location="${build.classes}"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test" depends="build, compile-tests" description="--> run tests">
+        <mkdir dir="${dist.test}"/>
+        <junitlauncher printsummary="true">
+            <classpath refid="test.classpath"/>
+            <testclasses outputdir="${dist.test}">
+                <fileset dir="${build.tests}">
+                    <include name="**/*.class"/>
+                </fileset>
+                <listener type="legacy-xml"
+                          sendSysOut="true"
+                          sendSysErr="true"/>
+                <fork/>
+            </testclasses>
+        </junitlauncher>
+    </target>
+
     <target name="native2ascii" description="Преобразование native2ascii для копий файлов локализации">
         <native2ascii src="${src.main.resources}"
                       dest="${native2ascii.resources}"
