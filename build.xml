@@ -71,7 +71,6 @@
         <delete dir="${dist.lib}"/>
         <delete dir="${dist}"/>
         <delete dir="${ivy.jar.dir}"/>
-        <delete dir="target"/>
         <delete dir="${native2ascii.resources}"/>
     </target>
 </project>
