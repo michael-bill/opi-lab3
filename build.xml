@@ -1,6 +1,8 @@
 <project name="laba3_web"
         basedir="."
-        default="build">
+        default="build"
+        xmlns:ac="antlib:net.sf.antcontrib"
+        xmlns:if="ant:if">
     <property file="build.properties"/>
 
     <path id="classpath-runtime">
@@ -85,6 +87,24 @@
                 <fork/>
             </testclasses>
         </junitlauncher>
+    </target>
+
+    <target name="diff">
+        <exec executable="git" dir=".">
+            <arg value="diff"/>
+            <arg value="--name-only"/>
+            <arg value="--cached"/>
+            <redirector outputproperty="git.diff"/>
+        </exec>
+        <condition property="has.changes">
+            <length string="${git.diff}" trim="true" when="greater" length="0"/>
+        </condition>
+        <echo message="Changes detected: ${git.diff}" if:true="${has.changes}"/>
+        <exec executable="git" dir="." if:true="${has.changes}">
+                    <arg value="commit"/>
+                    <arg value="-m"/>
+                    <arg value="ant: commit with diff"/>
+        </exec>
     </target>
 
     <target name="native2ascii" description="Преобразование native2ascii для копий файлов локализации">
