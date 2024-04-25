@@ -59,11 +59,19 @@
         </war>
     </target>
 
+    <target name="native2ascii" description="Преобразование native2ascii для копий файлов локализации">
+        <native2ascii src="${src.main.resources}"
+                      dest="${native2ascii.resources}"
+                      includes="**/*.properties"/>
+    </target>
+
+
     <target name="clean" description="clean up">
         <delete dir="${build}"/>
         <delete dir="${dist.lib}"/>
         <delete dir="${dist}"/>
         <delete dir="${ivy.jar.dir}"/>
         <delete dir="target"/>
+        <delete dir="${native2ascii.resources}"/>
     </target>
 </project>
